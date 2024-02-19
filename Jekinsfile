@@ -2,28 +2,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Kamal-21/jenkins-project1.git'
-            }
-        }
-
-        stage('Copy HTML to Nginx') {
+        stage('Checkout') {
             steps {
                 script {
-                    docker.image('nginx').inside {
-                        sh 'cp /home/kamal/jenkins-pipeline/index.html /usr/share/nginx/html/'
-                    }
+                    // Clean workspace before checkout
+                    deleteDir()
+
+                    // Clone the repository and specify the branch
+                    checkout([$class: 'GitSCM', branches: [[name: 'main']], userRemoteConfigs: [[url: 'https://github.com/Kamal-21/jenkins-project1.git']]])
                 }
             }
         }
-
-        stage('Restart Nginx') {
+        stage('Run Nginx Container') {
             steps {
                 script {
-                    docker.image('nginx').inside {
-                        sh 'service nginx restart'
+                    // Check if the container exists
+                    def containerExists = sh(script: 'docker ps -a --format "{{.Names}}" | grep my-nginx', returnStatus: true) == 0
+
+                    // If the container exists, stop and remove it
+                    if (containerExists) {
+                        sh 'docker stop my-nginx'
+                        sh 'docker rm my-nginx'
                     }
+
+                    // Run Nginx container
+                    sh 'docker run -d -p 80:80 --name my-nginx -v /var/lib/jenkins/workspace/project-1:/usr/share/nginx/html nginx'
                 }
             }
         }
