@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     // Check if the container exists
-                    def containerExists = sh(script: 'docker ps -a --format "{{.Names}}" | grep my-nginx', returnStatus: true) == 0
+                    def containerExists = sh(script: 'sudo docker ps -a --format "{{.Names}}" | grep my-nginx', returnStatus: true) == 0
 
                     // If the container exists, stop and remove it
                     if (containerExists) {
@@ -26,7 +26,7 @@ pipeline {
                     }
 
                     // Run Nginx container
-                    sh 'docker run -d -p 80:80 --name my-nginx -v /var/lib/jenkins/workspace/project-1:/usr/share/nginx/html nginx'
+                    sh 'sudo docker run -d -p 80:80 --name my-nginx -v /var/lib/jenkins/workspace/project-1:/usr/share/nginx/html nginx'
                 }
             }
         }
