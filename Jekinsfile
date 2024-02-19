@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/Kamal-21/jenkins-pipeline/'
+            }
+        }
+
+        stage('Copy HTML to Nginx') {
+            steps {
+                script {
+                    docker.image('nginx').inside {
+                        sh 'cp /home/kamal/jenkins-pipeline/index.html /usr/share/nginx/html/'
+                    }
+                }
+            }
+        }
+
+        stage('Restart Nginx') {
+            steps {
+                script {
+                    docker.image('nginx').inside {
+                        sh 'service nginx restart'
+                    }
+                }
+            }
+        }
+    }
+}
