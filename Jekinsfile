@@ -21,8 +21,8 @@ pipeline {
 
                     // If the container exists, stop and remove it
                     if (containerExists) {
-                        sh 'docker stop my-nginx'
-                        sh 'docker rm my-nginx'
+                        sh 'sudo docker stop my-nginx'
+                        sh 'sudo docker rm my-nginx'
                     }
 
                     // Run Nginx container
